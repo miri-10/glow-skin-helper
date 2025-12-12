@@ -52,8 +52,8 @@ export function Navbar() {
               <Shield className="w-5 h-5 text-primary-foreground" />
             </motion.div>
             <span className={cn(
-              "font-bold text-lg transition-colors",
-              showTransparent ? "text-foreground" : "text-foreground"
+              "font-semibold text-lg tracking-wide transition-colors",
+              showTransparent ? "text-slate-800" : "text-foreground"
             )}>SkinGuard</span>
           </Link>
 
@@ -64,13 +64,13 @@ export function Navbar() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                  "px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200",
                   location.pathname === item.path
                     ? showTransparent 
-                      ? "bg-foreground/10 text-foreground backdrop-blur-sm"
+                      ? "bg-slate-800/10 text-slate-800 backdrop-blur-sm"
                       : "bg-secondary text-secondary-foreground"
                     : showTransparent
-                      ? "text-foreground/80 hover:text-foreground hover:bg-foreground/10"
+                      ? "text-slate-700 hover:text-slate-900 hover:bg-slate-800/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
@@ -92,7 +92,7 @@ export function Navbar() {
           <button
             className={cn(
               "md:hidden p-2 rounded-lg transition-colors",
-              showTransparent ? "hover:bg-foreground/10" : "hover:bg-muted"
+              showTransparent ? "text-slate-700 hover:bg-slate-800/10" : "hover:bg-muted"
             )}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
