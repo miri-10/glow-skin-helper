@@ -1,16 +1,19 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Suspense, lazy } from "react";
 import { 
   Shield, 
   Upload, 
   Zap, 
   BookOpen, 
   ArrowRight,
-  CheckCircle2,
   AlertTriangle,
   Heart
 } from "lucide-react";
+import heroLandscape from "@/assets/hero-landscape.jpg";
+
+const FloatingCell = lazy(() => import("@/components/FloatingCell"));
 
 const features = [
   {
@@ -36,68 +39,178 @@ const stats = [
   { value: "#1", label: "Most common cancer" },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+};
+
+const floatAnimation = {
+  y: [-10, 10, -10],
+  transition: {
+    duration: 4,
+    repeat: Infinity,
+    ease: "easeInOut" as const,
+  },
+};
+
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/50 via-background to-background" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+    <div className="min-h-screen overflow-hidden">
+      {/* Hero Section with Image */}
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        {/* Hero Background Image */}
+        <motion.div 
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute inset-0"
+        >
+          <img 
+            src={heroLandscape} 
+            alt="Serene landscape" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background" />
+        </motion.div>
+
+        {/* 3D Floating Cells */}
+        <Suspense fallback={null}>
+          <FloatingCell />
+        </Suspense>
         
-        <div className="container mx-auto px-4 relative">
+        {/* Content */}
+        <div className="container mx-auto px-4 relative z-10 pt-20">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
             className="max-w-3xl mx-auto text-center"
           >
-            <div className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6">
-              <Shield className="w-4 h-4" />
+            <motion.div 
+              variants={itemVariants}
+              className="inline-flex items-center gap-2 bg-background/80 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-foreground mb-6 border border-border shadow-lg"
+            >
+              <motion.div animate={floatAnimation}>
+                <Shield className="w-4 h-4 text-primary" />
+              </motion.div>
               AI-Powered Skin Analysis
-            </div>
+            </motion.div>
             
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
+            <motion.h1 
+              variants={itemVariants}
+              className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 text-balance drop-shadow-sm"
+            >
               Detect Skin Cancer{" "}
-              <span className="text-primary">Early</span>, Save Lives
-            </h1>
+              <span className="text-primary relative">
+                Early
+                <motion.span
+                  className="absolute -bottom-2 left-0 right-0 h-1 bg-primary/30 rounded-full"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: 1, duration: 0.8 }}
+                />
+              </span>
+              , Save Lives
+            </motion.h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <motion.p 
+              variants={itemVariants}
+              className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto drop-shadow-sm"
+            >
               Upload a photo of your skin lesion and receive instant AI-powered analysis. 
               Early detection is key to successful treatment.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild variant="hero" size="xl">
-                <Link to="/detect">
-                  Start Detection
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="xl">
-                <Link to="/about">Learn More</Link>
-              </Button>
-            </div>
+            <motion.div 
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button asChild variant="hero" size="xl" className="shadow-xl">
+                  <Link to="/detect">
+                    Start Detection
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </Button>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button asChild variant="outline" size="xl" className="bg-background/80 backdrop-blur-md shadow-lg">
+                  <Link to="/about">Learn More</Link>
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          >
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="w-6 h-10 rounded-full border-2 border-foreground/30 flex items-start justify-center p-1"
+            >
+              <motion.div className="w-1.5 h-3 rounded-full bg-primary" />
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-card border-y border-border">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-card border-y border-border relative overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 0.5 }}
+          viewport={{ once: true }}
+          className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5"
+        />
+        <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.15, duration: 0.5 }}
                 viewport={{ once: true }}
                 className="text-center"
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                <motion.div 
+                  className="text-4xl md:text-5xl font-bold text-primary mb-2"
+                  initial={{ scale: 0.5 }}
+                  whileInView={{ scale: 1 }}
+                  transition={{ delay: index * 0.15 + 0.2, type: "spring", stiffness: 200 }}
+                  viewport={{ once: true }}
+                >
                   {stat.value}
-                </div>
+                </motion.div>
                 <div className="text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
@@ -126,15 +239,20 @@ export default function Home() {
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-lg transition-shadow"
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-xl transition-all duration-300"
               >
-                <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-6">
+                <motion.div 
+                  className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-6"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
                   <feature.icon className="w-7 h-7 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-semibold text-foreground mb-3">
                   {feature.title}
                 </h3>
@@ -150,8 +268,9 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
               <div className="inline-flex items-center gap-2 bg-warning/10 text-warning px-3 py-1 rounded-full text-sm font-medium mb-4">
@@ -165,20 +284,17 @@ export default function Home() {
                 Use the ABCDE rule to identify potential warning signs. If you notice any of these, 
                 consult a dermatologist immediately.
               </p>
-              <Button asChild variant="secondary" size="lg">
-                <Link to="/about">
-                  Learn More About Symptoms
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                <Button asChild variant="secondary" size="lg">
+                  <Link to="/about">
+                    Learn More About Symptoms
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </motion.div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-4"
-            >
+            <div className="space-y-4">
               {[
                 { letter: "A", title: "Asymmetry", desc: "One half doesn't match the other" },
                 { letter: "B", title: "Border", desc: "Edges are irregular or blurred" },
@@ -188,22 +304,26 @@ export default function Home() {
               ].map((item, index) => (
                 <motion.div
                   key={item.letter}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
                   viewport={{ once: true }}
-                  className="flex items-start gap-4 bg-background rounded-xl p-4 border border-border"
+                  whileHover={{ x: 8, transition: { duration: 0.2 } }}
+                  className="flex items-start gap-4 bg-background rounded-xl p-4 border border-border hover:border-primary/30 transition-colors cursor-default"
                 >
-                  <div className="w-10 h-10 rounded-lg gradient-hero flex items-center justify-center shrink-0">
+                  <motion.div 
+                    className="w-10 h-10 rounded-lg gradient-hero flex items-center justify-center shrink-0"
+                    whileHover={{ scale: 1.1 }}
+                  >
                     <span className="font-bold text-primary-foreground">{item.letter}</span>
-                  </div>
+                  </motion.div>
                   <div>
                     <h4 className="font-semibold text-foreground">{item.title}</h4>
                     <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </div>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -212,27 +332,48 @@ export default function Home() {
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary/10 via-secondary to-secondary rounded-3xl p-12 md:p-16 border border-border"
+            className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary/10 via-secondary to-secondary rounded-3xl p-12 md:p-16 border border-border relative overflow-hidden"
           >
-            <div className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-6">
+            <motion.div
+              className="absolute inset-0 opacity-30"
+              animate={{
+                background: [
+                  "radial-gradient(circle at 20% 50%, hsl(var(--primary) / 0.3) 0%, transparent 50%)",
+                  "radial-gradient(circle at 80% 50%, hsl(var(--primary) / 0.3) 0%, transparent 50%)",
+                  "radial-gradient(circle at 20% 50%, hsl(var(--primary) / 0.3) 0%, transparent 50%)",
+                ],
+              }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div 
+              className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-6 relative"
+              animate={floatAnimation}
+            >
               <Heart className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            </motion.div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 relative">
               Your Health Matters
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto relative">
               Don't wait for symptoms to worsen. Early detection can save lives. 
               Start your skin analysis today.
             </p>
-            <Button asChild variant="hero" size="xl">
-              <Link to="/detect">
-                Analyze Your Skin Now
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
+            <motion.div 
+              className="relative"
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button asChild variant="hero" size="xl" className="shadow-xl">
+                <Link to="/detect">
+                  Analyze Your Skin Now
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </Button>
+            </motion.div>
           </motion.div>
         </div>
       </section>
