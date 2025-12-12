@@ -67,10 +67,10 @@ export function Navbar() {
                   "px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200",
                   location.pathname === item.path
                     ? showTransparent 
-                      ? "bg-slate-800/10 text-slate-800 backdrop-blur-sm"
+                      ? "text-slate-800"
                       : "bg-secondary text-secondary-foreground"
                     : showTransparent
-                      ? "text-slate-700 hover:text-slate-900 hover:bg-slate-800/10"
+                      ? "text-slate-700 hover:text-slate-900"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
