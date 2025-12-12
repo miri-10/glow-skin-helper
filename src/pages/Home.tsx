@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Suspense, lazy } from "react";
 import { 
   Shield, 
   Upload, 
@@ -12,8 +11,6 @@ import {
   Heart
 } from "lucide-react";
 import heroLandscape from "@/assets/hero-landscape.jpg";
-
-const FloatingCell = lazy(() => import("@/components/FloatingCell"));
 
 const features = [
   {
@@ -57,17 +54,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.22, 1, 0.36, 1] as const,
     },
-  },
-};
-
-const floatAnimation = {
-  y: [-10, 10, -10],
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: "easeInOut" as const,
   },
 };
 
@@ -75,7 +62,7 @@ export default function Home() {
   return (
     <div className="min-h-screen overflow-hidden">
       {/* Hero Section with Image */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Hero Background Image */}
         <motion.div 
           initial={{ scale: 1.1, opacity: 0 }}
@@ -88,13 +75,8 @@ export default function Home() {
             alt="Serene landscape" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/10 to-background" />
         </motion.div>
-
-        {/* 3D Floating Cells */}
-        <Suspense fallback={null}>
-          <FloatingCell />
-        </Suspense>
         
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10 pt-20">
@@ -106,23 +88,25 @@ export default function Home() {
           >
             <motion.div 
               variants={itemVariants}
-              className="inline-flex items-center gap-2 bg-background/80 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-foreground mb-6 border border-border shadow-lg"
+              className="inline-flex items-center gap-2 bg-card/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-foreground mb-6 border border-border shadow-lg"
             >
-              <motion.div animate={floatAnimation}>
-                <Shield className="w-4 h-4 text-primary" />
-              </motion.div>
+              <Shield className="w-4 h-4 text-primary" />
               AI-Powered Skin Analysis
             </motion.div>
             
             <motion.h1 
               variants={itemVariants}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 text-balance drop-shadow-sm"
+              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance"
+              style={{ 
+                color: "hsl(220 20% 20%)",
+                textShadow: "0 2px 20px rgba(255,255,255,0.5)"
+              }}
             >
               Detect Skin Cancer{" "}
               <span className="text-primary relative">
                 Early
                 <motion.span
-                  className="absolute -bottom-2 left-0 right-0 h-1 bg-primary/30 rounded-full"
+                  className="absolute -bottom-2 left-0 right-0 h-1 bg-primary/50 rounded-full"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 1, duration: 0.8 }}
@@ -133,7 +117,11 @@ export default function Home() {
             
             <motion.p 
               variants={itemVariants}
-              className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto drop-shadow-sm"
+              className="text-lg md:text-xl mb-8 max-w-2xl mx-auto font-medium"
+              style={{ 
+                color: "hsl(220 15% 30%)",
+                textShadow: "0 1px 10px rgba(255,255,255,0.8)"
+              }}
             >
               Upload a photo of your skin lesion and receive instant AI-powered analysis. 
               Early detection is key to successful treatment.
@@ -158,7 +146,7 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Button asChild variant="outline" size="xl" className="bg-background/80 backdrop-blur-md shadow-lg">
+                <Button asChild variant="outline" size="xl" className="bg-card/90 backdrop-blur-md shadow-lg border-border">
                   <Link to="/about">Learn More</Link>
                 </Button>
               </motion.div>
@@ -175,7 +163,7 @@ export default function Home() {
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-6 h-10 rounded-full border-2 border-foreground/30 flex items-start justify-center p-1"
+              className="w-6 h-10 rounded-full border-2 border-foreground/40 flex items-start justify-center p-1 bg-card/50 backdrop-blur-sm"
             >
               <motion.div className="w-1.5 h-3 rounded-full bg-primary" />
             </motion.div>
@@ -200,7 +188,8 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.15, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="text-center"
+                whileHover={{ scale: 1.05 }}
+                className="text-center cursor-default"
               >
                 <motion.div 
                   className="text-4xl md:text-5xl font-bold text-primary mb-2"
@@ -244,11 +233,11 @@ export default function Home() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-xl transition-all duration-300"
+                className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-xl hover:border-primary/30 transition-all duration-300 cursor-default"
               >
                 <motion.div 
                   className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-6"
-                  whileHover={{ rotate: 360 }}
+                  whileHover={{ rotate: 360, scale: 1.1 }}
                   transition={{ duration: 0.6 }}
                 >
                   <feature.icon className="w-7 h-7 text-primary-foreground" />
@@ -308,12 +297,12 @@ export default function Home() {
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   viewport={{ once: true }}
-                  whileHover={{ x: 8, transition: { duration: 0.2 } }}
-                  className="flex items-start gap-4 bg-background rounded-xl p-4 border border-border hover:border-primary/30 transition-colors cursor-default"
+                  whileHover={{ x: 8, scale: 1.02, transition: { duration: 0.2 } }}
+                  className="flex items-start gap-4 bg-background rounded-xl p-4 border border-border hover:border-primary/30 hover:shadow-md transition-all cursor-default"
                 >
                   <motion.div 
                     className="w-10 h-10 rounded-lg gradient-hero flex items-center justify-center shrink-0"
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
                   >
                     <span className="font-bold text-primary-foreground">{item.letter}</span>
                   </motion.div>
@@ -336,6 +325,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
+            whileHover={{ scale: 1.01 }}
             className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary/10 via-secondary to-secondary rounded-3xl p-12 md:p-16 border border-border relative overflow-hidden"
           >
             <motion.div
@@ -351,7 +341,8 @@ export default function Home() {
             />
             <motion.div 
               className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-6 relative"
-              animate={floatAnimation}
+              animate={{ y: [-5, 5, -5] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
               <Heart className="w-8 h-8 text-primary-foreground" />
             </motion.div>

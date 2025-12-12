@@ -82,6 +82,19 @@ const whenToSeeDoctor = [
   "A dark band under a nail"
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
 export default function About() {
   return (
     <div className="min-h-screen py-12 md:py-20">
@@ -92,10 +105,15 @@ export default function About() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6"
+          >
             <Heart className="w-4 h-4" />
             Educational Resource
-          </div>
+          </motion.div>
           <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
             About Skin Cancer
           </h1>
@@ -112,7 +130,11 @@ export default function About() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <div className="bg-card rounded-2xl p-8 md:p-12 border border-border shadow-soft">
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+            className="bg-card rounded-2xl p-8 md:p-12 border border-border shadow-soft hover:shadow-lg transition-shadow"
+          >
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
               What is Skin Cancer?
             </h2>
@@ -131,7 +153,7 @@ export default function About() {
                 skin cancer early when it's most treatable.
               </p>
             </div>
-          </div>
+          </motion.div>
         </motion.section>
 
         {/* Types of Skin Cancer */}
@@ -152,27 +174,41 @@ export default function About() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-soft"
+                whileHover={{ scale: 1.02, x: 10 }}
+                className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-soft hover:shadow-lg transition-all cursor-default"
               >
                 <div className="flex flex-col md:flex-row md:items-start gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-4">
                       <h3 className="text-xl font-bold text-foreground">{type.name}</h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${type.color}`}>
+                      <motion.span 
+                        whileHover={{ scale: 1.1 }}
+                        className={`px-3 py-1 rounded-full text-xs font-medium border ${type.color}`}
+                      >
                         {type.risk} Risk
-                      </span>
+                      </motion.span>
                     </div>
                     <p className="text-muted-foreground mb-4">{type.description}</p>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">Common Characteristics:</h4>
-                      <ul className="grid md:grid-cols-2 gap-2">
+                      <motion.ul 
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="grid md:grid-cols-2 gap-2"
+                      >
                         {type.characteristics.map((char, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <motion.li 
+                            key={i} 
+                            variants={itemVariants}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
                             <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                             {char}
-                          </li>
+                          </motion.li>
                         ))}
-                      </ul>
+                      </motion.ul>
                     </div>
                   </div>
                 </div>
@@ -199,11 +235,16 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-card rounded-2xl p-6 border border-border shadow-soft"
+                whileHover={{ y: -5, scale: 1.02 }}
+                className="bg-card rounded-2xl p-6 border border-border shadow-soft hover:shadow-lg hover:border-primary/30 transition-all cursor-default"
               >
-                <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center mb-4">
+                <motion.div 
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center mb-4"
+                >
                   <symptom.icon className="w-6 h-6 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">{symptom.title}</h3>
                 <p className="text-muted-foreground">{symptom.description}</p>
               </motion.div>
@@ -240,11 +281,16 @@ export default function About() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-card rounded-xl p-4 text-center border border-border"
+                  whileHover={{ y: -5, scale: 1.05 }}
+                  className="bg-card rounded-xl p-4 text-center border border-border hover:border-primary/30 transition-all cursor-default"
                 >
-                  <div className="w-12 h-12 rounded-lg gradient-hero flex items-center justify-center mx-auto mb-3">
+                  <motion.div 
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-12 h-12 rounded-lg gradient-hero flex items-center justify-center mx-auto mb-3"
+                  >
                     <span className="text-xl font-bold text-primary-foreground">{item.letter}</span>
-                  </div>
+                  </motion.div>
                   <h4 className="font-semibold text-foreground mb-1">{item.word}</h4>
                   <p className="text-xs text-muted-foreground">{item.desc}</p>
                 </motion.div>
@@ -260,11 +306,18 @@ export default function About() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <div className="bg-card rounded-2xl p-8 md:p-12 border border-border shadow-soft">
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="bg-card rounded-2xl p-8 md:p-12 border border-border shadow-soft hover:shadow-lg transition-all"
+          >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <motion.div 
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center"
+              >
                 <Stethoscope className="w-6 h-6 text-destructive" />
-              </div>
+              </motion.div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 When to See a Doctor
               </h2>
@@ -272,15 +325,26 @@ export default function About() {
             <p className="text-muted-foreground mb-6">
               Make an appointment with your doctor if you notice any of the following:
             </p>
-            <div className="grid md:grid-cols-2 gap-4">
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid md:grid-cols-2 gap-4"
+            >
               {whenToSeeDoctor.map((item, index) => (
-                <div key={index} className="flex items-start gap-3 bg-background rounded-lg p-4 border border-border">
+                <motion.div 
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ x: 5, scale: 1.02 }}
+                  className="flex items-start gap-3 bg-background rounded-lg p-4 border border-border hover:border-destructive/30 transition-all cursor-default"
+                >
                   <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
                   <span className="text-muted-foreground">{item}</span>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </motion.section>
 
         {/* Importance of Early Detection */}
@@ -290,9 +354,17 @@ export default function About() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <div className="bg-success/5 border border-success/20 rounded-2xl p-8 md:p-12">
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="bg-success/5 border border-success/20 rounded-2xl p-8 md:p-12 hover:shadow-lg transition-all"
+          >
             <div className="flex items-center gap-3 mb-6">
-              <CheckCircle2 className="w-8 h-8 text-success" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
+                <CheckCircle2 className="w-8 h-8 text-success" />
+              </motion.div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 The Importance of Early Detection
               </h2>
@@ -311,7 +383,7 @@ export default function About() {
                 schedule an appointment with a healthcare provider right away.
               </p>
             </div>
-          </div>
+          </motion.div>
         </motion.section>
 
         {/* CTA */}
@@ -322,9 +394,11 @@ export default function About() {
           className="text-center"
         >
           <p className="text-muted-foreground mb-4">Ready to check your skin?</p>
-          <Button asChild variant="hero" size="xl">
-            <Link to="/detect">Start Detection Now</Link>
-          </Button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button asChild variant="hero" size="xl">
+              <Link to="/detect">Start Detection Now</Link>
+            </Button>
+          </motion.div>
         </motion.div>
       </div>
     </div>
