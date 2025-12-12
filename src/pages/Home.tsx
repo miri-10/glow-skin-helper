@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import FloatingCell from "@/components/FloatingCell";
 import { 
   Shield, 
   Upload, 
@@ -77,6 +78,9 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/10 to-background" />
         </motion.div>
+
+        {/* 3D Floating Cells */}
+        <FloatingCell />
         
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10 pt-20">
