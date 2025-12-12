@@ -119,6 +119,19 @@ const mythsAndFacts = [
   }
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { opacity: 1, x: 0 }
+};
+
 export default function Prevention() {
   return (
     <div className="min-h-screen py-12 md:py-20">
@@ -129,10 +142,15 @@ export default function Prevention() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6"
+          >
             <Shield className="w-4 h-4" />
             Prevention Guide
-          </div>
+          </motion.div>
           <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
             Prevention Tips
           </h1>
@@ -160,21 +178,36 @@ export default function Prevention() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className={`bg-gradient-to-br ${tip.color} rounded-2xl p-6 md:p-8 border border-border`}
+                whileHover={{ y: -5, scale: 1.02 }}
+                className={`bg-gradient-to-br ${tip.color} rounded-2xl p-6 md:p-8 border border-border hover:shadow-lg transition-all cursor-default`}
               >
-                <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-4">
+                <motion.div 
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-4"
+                >
                   <tip.icon className="w-7 h-7 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-bold text-foreground mb-2">{tip.title}</h3>
                 <p className="text-muted-foreground mb-4">{tip.description}</p>
-                <ul className="space-y-2">
+                <motion.ul 
+                  variants={containerVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="space-y-2"
+                >
                   {tip.details.map((detail, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <motion.li 
+                      key={i} 
+                      variants={itemVariants}
+                      className="flex items-start gap-2 text-sm text-muted-foreground"
+                    >
                       <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                       {detail}
-                    </li>
+                    </motion.li>
                   ))}
-                </ul>
+                </motion.ul>
               </motion.div>
             ))}
           </div>
@@ -187,11 +220,18 @@ export default function Prevention() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <div className="bg-card rounded-2xl p-8 md:p-12 border border-border shadow-soft">
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="bg-card rounded-2xl p-8 md:p-12 border border-border shadow-soft hover:shadow-lg transition-all"
+          >
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center">
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center"
+              >
                 <Sun className="w-7 h-7 text-primary-foreground" />
-              </div>
+              </motion.div>
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Understanding UV Index</h2>
                 <p className="text-muted-foreground">Know when to take extra precautions</p>
@@ -212,16 +252,20 @@ export default function Prevention() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="text-center"
+                  whileHover={{ y: -5, scale: 1.05 }}
+                  className="text-center cursor-default"
                 >
-                  <div className={`w-full h-3 ${uv.color} rounded-full mb-3`} />
+                  <motion.div 
+                    className={`w-full h-3 ${uv.color} rounded-full mb-3`}
+                    whileHover={{ scaleY: 1.5 }}
+                  />
                   <div className="text-2xl font-bold text-foreground">{uv.range}</div>
                   <div className="text-sm font-medium text-foreground">{uv.level}</div>
                   <div className="text-xs text-muted-foreground mt-1">{uv.action}</div>
                 </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </motion.section>
 
         {/* Risk Factors */}
@@ -231,9 +275,17 @@ export default function Prevention() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <div className="bg-warning/5 border border-warning/20 rounded-2xl p-8 md:p-12">
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="bg-warning/5 border border-warning/20 rounded-2xl p-8 md:p-12 hover:shadow-lg transition-all"
+          >
             <div className="flex items-center gap-3 mb-6">
-              <AlertTriangle className="w-8 h-8 text-warning" />
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <AlertTriangle className="w-8 h-8 text-warning" />
+              </motion.div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 Know Your Risk Factors
               </h2>
@@ -242,24 +294,31 @@ export default function Prevention() {
               Some factors can increase your risk of developing skin cancer. If any of these apply to you, 
               take extra precautions and consider more frequent skin checks:
             </p>
-            <div className="grid md:grid-cols-2 gap-4">
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid md:grid-cols-2 gap-4"
+            >
               {riskFactors.map((factor, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                  className="flex items-start gap-3 bg-card rounded-lg p-4 border border-border"
+                  variants={itemVariants}
+                  whileHover={{ x: 5, scale: 1.02 }}
+                  className="flex items-start gap-3 bg-card rounded-lg p-4 border border-border hover:border-warning/30 transition-all cursor-default"
                 >
-                  <div className="w-6 h-6 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+                  <motion.div 
+                    whileHover={{ scale: 1.2, rotate: 360 }}
+                    className="w-6 h-6 rounded-full bg-warning/20 flex items-center justify-center shrink-0"
+                  >
                     <span className="text-warning text-sm font-bold">{index + 1}</span>
-                  </div>
+                  </motion.div>
                   <span className="text-muted-foreground">{factor}</span>
                 </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </motion.section>
 
         {/* Myths vs Facts */}
@@ -280,25 +339,32 @@ export default function Prevention() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-card rounded-2xl p-6 border border-border shadow-soft"
+                whileHover={{ scale: 1.02 }}
+                className="bg-card rounded-2xl p-6 border border-border shadow-soft hover:shadow-lg transition-all cursor-default"
               >
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-destructive/5 rounded-xl p-4 border border-destructive/20">
+                  <motion.div 
+                    whileHover={{ x: -5 }}
+                    className="bg-destructive/5 rounded-xl p-4 border border-destructive/20"
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2 py-0.5 rounded bg-destructive text-destructive-foreground text-xs font-medium">
                         MYTH
                       </span>
                     </div>
                     <p className="text-foreground">{item.myth}</p>
-                  </div>
-                  <div className="bg-success/5 rounded-xl p-4 border border-success/20">
+                  </motion.div>
+                  <motion.div 
+                    whileHover={{ x: 5 }}
+                    className="bg-success/5 rounded-xl p-4 border border-success/20"
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2 py-0.5 rounded bg-success text-success-foreground text-xs font-medium">
                         FACT
                       </span>
                     </div>
                     <p className="text-foreground">{item.fact}</p>
-                  </div>
+                  </motion.div>
                 </div>
               </motion.div>
             ))}
@@ -316,7 +382,13 @@ export default function Prevention() {
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 text-center">
               Daily Sun Protection Checklist
             </h2>
-            <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto"
+            >
               {[
                 "Applied SPF 30+ sunscreen before going out",
                 "Wearing protective clothing (hat, sunglasses)",
@@ -329,19 +401,20 @@ export default function Prevention() {
               ].map((item, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                  className="flex items-center gap-3 bg-card rounded-lg p-4 border border-border"
+                  variants={itemVariants}
+                  whileHover={{ x: 5, scale: 1.02 }}
+                  className="flex items-center gap-3 bg-card rounded-lg p-4 border border-border hover:border-primary/30 transition-all cursor-default"
                 >
-                  <div className="w-6 h-6 rounded-md border-2 border-primary flex items-center justify-center">
+                  <motion.div 
+                    whileHover={{ scale: 1.2 }}
+                    className="w-6 h-6 rounded-md border-2 border-primary flex items-center justify-center"
+                  >
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                  </div>
+                  </motion.div>
                   <span className="text-muted-foreground">{item}</span>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </motion.section>
 
@@ -353,9 +426,11 @@ export default function Prevention() {
           className="text-center"
         >
           <p className="text-muted-foreground mb-4">Ready to check your skin?</p>
-          <Button asChild variant="hero" size="xl">
-            <Link to="/detect">Start Detection Now</Link>
-          </Button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button asChild variant="hero" size="xl">
+              <Link to="/detect">Start Detection Now</Link>
+            </Button>
+          </motion.div>
         </motion.div>
       </div>
     </div>

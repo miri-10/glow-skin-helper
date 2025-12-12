@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Image as ImageIcon,
-  Info
+  Info,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -150,6 +151,15 @@ export default function Detect() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6"
+          >
+            <Sparkles className="w-4 h-4" />
+            AI-Powered Analysis
+          </motion.div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Skin Lesion Analysis
           </h1>
@@ -166,7 +176,8 @@ export default function Detect() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div
+            <motion.div
+              whileHover={{ scale: previewUrl ? 1 : 1.02 }}
               onDragOver={(e) => {
                 e.preventDefault();
                 setIsDragging(true);
@@ -179,7 +190,7 @@ export default function Detect() {
                   ? "border-primary bg-primary/5"
                   : previewUrl
                   ? "border-border bg-card"
-                  : "border-border hover:border-primary/50 bg-card"
+                  : "border-border hover:border-primary/50 bg-card hover:shadow-lg"
               )}
             >
               <AnimatePresence mode="wait">
@@ -196,12 +207,14 @@ export default function Detect() {
                       alt="Selected skin lesion"
                       className="w-full h-64 object-cover rounded-xl"
                     />
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={clearImage}
                       className="absolute -top-2 -right-2 w-8 h-8 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-destructive/90 transition-colors"
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </motion.button>
                     {isAnalyzing && (
                       <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                         <div className="w-full h-1 bg-primary/30 absolute top-0 rounded-t-xl overflow-hidden">
@@ -227,9 +240,13 @@ export default function Detect() {
                     exit={{ opacity: 0 }}
                     className="text-center"
                   >
-                    <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+                    <motion.div 
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"
+                    >
                       <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                    </div>
+                    </motion.div>
                     <p className="text-foreground font-medium mb-2">
                       Drop your image here
                     </p>
@@ -245,7 +262,7 @@ export default function Detect() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
 
             {selectedImage && !isAnalyzing && (
               <motion.div
@@ -253,21 +270,29 @@ export default function Detect() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-4"
               >
-                <Button
-                  onClick={handleAnalyze}
-                  variant="hero"
-                  size="lg"
-                  className="w-full"
-                  disabled={isAnalyzing}
-                >
-                  <Upload className="w-5 h-5" />
-                  Analyze Image
-                </Button>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleAnalyze}
+                    variant="hero"
+                    size="lg"
+                    className="w-full"
+                    disabled={isAnalyzing}
+                  >
+                    <Upload className="w-5 h-5" />
+                    Analyze Image
+                  </Button>
+                </motion.div>
               </motion.div>
             )}
 
             {/* Tips */}
-            <div className="mt-6 bg-secondary/50 rounded-xl p-4 border border-border">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              whileHover={{ scale: 1.02 }}
+              className="mt-6 bg-secondary/50 rounded-xl p-4 border border-border hover:shadow-md transition-all"
+            >
               <div className="flex items-start gap-3">
                 <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                 <div>
@@ -280,7 +305,7 @@ export default function Detect() {
                   </ul>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Results Section */}
@@ -303,13 +328,21 @@ export default function Detect() {
                     const Icon = styles.icon;
                     return (
                       <>
-                        <div className={cn(
-                          "rounded-2xl p-6 border",
-                          styles.bg,
-                          styles.border
-                        )}>
+                        <motion.div 
+                          whileHover={{ scale: 1.02 }}
+                          className={cn(
+                            "rounded-2xl p-6 border transition-all",
+                            styles.bg,
+                            styles.border
+                          )}
+                        >
                           <div className="flex items-center gap-3 mb-4">
-                            <Icon className={cn("w-8 h-8", styles.iconColor)} />
+                            <motion.div
+                              animate={{ scale: [1, 1.1, 1] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                            >
+                              <Icon className={cn("w-8 h-8", styles.iconColor)} />
+                            </motion.div>
                             <div>
                               <h3 className="text-xl font-semibold text-foreground">
                                 {styles.label}
@@ -336,29 +369,40 @@ export default function Detect() {
                           <p className="text-muted-foreground text-sm leading-relaxed">
                             {result.explanation}
                           </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-card rounded-2xl p-6 border border-border shadow-soft">
+                        <motion.div 
+                          whileHover={{ scale: 1.02 }}
+                          className="bg-card rounded-2xl p-6 border border-border shadow-soft hover:shadow-lg transition-all"
+                        >
                           <h4 className="font-semibold text-foreground mb-4">
                             Recommendations
                           </h4>
                           <ul className="space-y-3">
                             {result.recommendations.map((rec, index) => (
-                              <li key={index} className="flex items-start gap-3">
+                              <motion.li 
+                                key={index} 
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="flex items-start gap-3"
+                              >
                                 <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                                 <span className="text-sm text-muted-foreground">{rec}</span>
-                              </li>
+                              </motion.li>
                             ))}
                           </ul>
-                        </div>
+                        </motion.div>
 
-                        <Button
-                          onClick={clearImage}
-                          variant="outline"
-                          className="w-full"
-                        >
-                          Analyze Another Image
-                        </Button>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Button
+                            onClick={clearImage}
+                            variant="outline"
+                            className="w-full"
+                          >
+                            Analyze Another Image
+                          </Button>
+                        </motion.div>
                       </>
                     );
                   })()}
@@ -369,12 +413,17 @@ export default function Detect() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-full min-h-[400px] flex items-center justify-center bg-card rounded-2xl border border-border"
+                  whileHover={{ scale: 1.02 }}
+                  className="h-full min-h-[400px] flex items-center justify-center bg-card rounded-2xl border border-border hover:shadow-lg transition-all"
                 >
                   <div className="text-center p-8">
-                    <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+                    <motion.div 
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"
+                    >
                       <AlertCircle className="w-8 h-8 text-muted-foreground" />
-                    </div>
+                    </motion.div>
                     <h3 className="font-semibold text-foreground mb-2">
                       No Analysis Yet
                     </h3>
@@ -393,7 +442,8 @@ export default function Detect() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-12 bg-warning/5 border border-warning/20 rounded-xl p-4 text-center"
+          whileHover={{ scale: 1.01 }}
+          className="mt-12 bg-warning/5 border border-warning/20 rounded-xl p-4 text-center hover:shadow-md transition-all"
         >
           <p className="text-sm text-muted-foreground">
             <strong className="text-foreground">Important:</strong> This tool is for educational purposes only 
