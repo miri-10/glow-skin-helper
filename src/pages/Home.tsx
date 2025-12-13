@@ -157,21 +157,7 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Scroll Indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-6 h-10 rounded-full border-2 border-foreground/40 flex items-start justify-center p-1 bg-card/50 backdrop-blur-sm"
-            >
-              <motion.div className="w-1.5 h-3 rounded-full bg-primary" />
-            </motion.div>
-          </motion.div>
+
         </div>
       </section>
 
@@ -277,14 +263,24 @@ export default function Home() {
                 Use the ABCDE rule to identify potential warning signs. If you notice any of these, 
                 consult a dermatologist immediately.
               </p>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-                <Button asChild variant="secondary" size="lg">
-                  <Link to="/about">
-                    Learn More About Symptoms
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </Button>
-              </motion.div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                  <Button asChild variant="secondary" size="lg">
+                    <Link to="/about">
+                      Learn More About Symptoms
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                  <Button asChild variant="outline" size="lg">
+                    <Link to="/medical-help">
+                      Find Medical Help
+                      <Heart className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                </motion.div>
+              </div>
             </motion.div>
 
             <div className="space-y-4">

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { MedicalRecommendations } from "@/components/MedicalRecommendations";
 
 interface AnalysisResult {
   prediction: "benign" | "malignant" | "uncertain";
@@ -394,15 +395,32 @@ export default function Detect() {
                           </ul>
                         </motion.div>
 
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                          <Button
-                            onClick={clearImage}
-                            variant="outline"
-                            className="w-full"
-                          >
-                            Analyze Another Image
-                          </Button>
-                        </motion.div>
+                        <div className="flex gap-2">
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                            <Button
+                              onClick={clearImage}
+                              variant="outline"
+                              className="w-full"
+                            >
+                              Analyze Another Image
+                            </Button>
+                          </motion.div>
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                            <Button
+                              asChild
+                              variant="secondary"
+                              className="w-full"
+                            >
+                              <a href="/medical-help">Find Medical Help</a>
+                            </Button>
+                          </motion.div>
+                        </div>
+
+                        {/* Medical Recommendations */}
+                        <MedicalRecommendations 
+                          prediction={result.prediction}
+                          confidence={result.confidence}
+                        />
                       </>
                     );
                   })()}

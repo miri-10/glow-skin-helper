@@ -10,6 +10,13 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isLogin = location.pathname === "/login";
+  const isSignUp = location.pathname === "/signup";
+
+  // Login and signup pages get full screen without navbar/footer
+  if (isLogin || isSignUp) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -59,6 +59,37 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Framer Motion (for animations)
+- React Router (for navigation)
+
+## Features
+
+### Interactive Login Page
+- **Route**: `/login`
+- **Features**:
+  - Cute animal cursor follower that changes every 5 seconds
+  - Click anywhere to see sparkle effects and change the animal
+  - Smooth animations and transitions
+  - Responsive design with gradient background
+  - Floating background elements
+  - Form validation and loading states
+
+### Medical Recommendation System
+- **Route**: `/medical-help`
+- **Features**:
+  - Location-based doctor and hospital recommendations
+  - GPS location access or manual city input
+  - Smart recommendations based on AI prediction risk levels
+  - Dermatologist and hospital cards with contact information
+  - Distance calculation and Google Maps integration
+  - Emergency priority tagging for high-risk cases
+  - Privacy-protected location handling
+
+### AI-Powered Detection Integration
+- Medical recommendations automatically appear after AI analysis
+- Risk-level based prioritization (High/Medium/Low)
+- Seamless integration with detection results
+- Professional medical facility suggestions
 
 ## How can I deploy this project?
 

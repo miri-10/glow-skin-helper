@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const navItems = [
   { label: "Home", path: "/" },
   { label: "Detect", path: "/detect" },
+  { label: "Medical Help", path: "/medical-help" },
   { label: "About Skin Cancer", path: "/about" },
   { label: "Prevention Tips", path: "/prevention" },
 ];
@@ -79,8 +80,13 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/login">Login</Link>
+              </Button>
+            </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button asChild variant="hero" size="sm">
                 <Link to="/detect">Get Started</Link>
@@ -132,11 +138,18 @@ export function Navbar() {
                   </Link>
                 </motion.div>
               ))}
-              <Button asChild variant="hero" className="w-full mt-4">
-                <Link to="/detect" onClick={() => setMobileMenuOpen(false)}>
-                  Get Started
-                </Link>
-              </Button>
+              <div className="space-y-2 mt-4">
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    Login
+                  </Link>
+                </Button>
+                <Button asChild variant="hero" className="w-full">
+                  <Link to="/detect" onClick={() => setMobileMenuOpen(false)}>
+                    Get Started
+                  </Link>
+                </Button>
+              </div>
             </div>
           </motion.div>
         )}
