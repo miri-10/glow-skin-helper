@@ -134,8 +134,14 @@ const itemVariants = {
 
 export default function Prevention() {
   return (
-    <div className="min-h-screen py-12 md:py-20">
-      <div className="container mx-auto px-4 max-w-5xl">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.05 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      className="min-h-screen py-6 md:py-8 relative overflow-hidden"
+    >
+      <div className="container mx-auto px-4 max-w-5xl relative z-10 pt-20">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -146,15 +152,27 @@ export default function Prevention() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6"
+            className="inline-flex items-center gap-2 bg-card/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-foreground mb-6 border border-border shadow-lg"
           >
             <Shield className="w-4 h-4" />
             Prevention Guide
           </motion.div>
-          <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+          <h1 
+            className="text-3xl md:text-5xl font-bold mb-6"
+            style={{ 
+              color: "hsl(220 20% 20%)",
+              textShadow: "0 2px 20px rgba(255,255,255,0.5)"
+            }}
+          >
             Prevention Tips
           </h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p 
+            className="text-lg max-w-3xl mx-auto"
+            style={{ 
+              color: "hsl(220 15% 30%)",
+              textShadow: "0 1px 10px rgba(255,255,255,0.8)"
+            }}
+          >
             The best way to fight skin cancer is to prevent it. Follow these evidence-based 
             tips to protect your skin and reduce your risk.
           </p>
@@ -433,6 +451,6 @@ export default function Prevention() {
           </motion.div>
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

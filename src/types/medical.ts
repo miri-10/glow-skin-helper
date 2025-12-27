@@ -16,6 +16,8 @@ export interface Doctor {
   rating?: number;
   experience?: string;
   isEmergency?: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Hospital {
@@ -29,6 +31,8 @@ export interface Hospital {
   hasEmergency?: boolean;
   specialties?: string[];
   googleMapsUrl?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface MedicalRecommendations {

@@ -18,6 +18,10 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const isHome = location.pathname === "/";
+  const isDetect = location.pathname === "/detect";
+  const isMedicalHelp = location.pathname === "/medical-help";
+  const isAbout = location.pathname === "/about";
+  const isPrevention = location.pathname === "/prevention";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +31,8 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const showTransparent = isHome && !scrolled && !mobileMenuOpen;
+  const hasSharedBackground = isHome || isDetect || isMedicalHelp || isAbout || isPrevention;
+  const showTransparent = hasSharedBackground && !scrolled && !mobileMenuOpen;
 
   return (
     <motion.nav 

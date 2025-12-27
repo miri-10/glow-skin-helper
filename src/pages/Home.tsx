@@ -11,7 +11,7 @@ import {
   AlertTriangle,
   Heart
 } from "lucide-react";
-import heroLandscape from "@/assets/hero-landscape.jpg";
+
 
 const features = [
   {
@@ -61,23 +61,15 @@ const itemVariants = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen overflow-hidden">
-      {/* Hero Section with Image */}
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.05 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      className="min-h-screen overflow-hidden"
+    >
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Hero Background Image */}
-        <motion.div 
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="absolute inset-0"
-        >
-          <img 
-            src={heroLandscape} 
-            alt="Serene landscape" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/10 to-background" />
-        </motion.div>
 
         {/* 3D Floating Cells */}
         <FloatingCell />
@@ -162,12 +154,12 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-card border-y border-border relative overflow-hidden">
+      <section className="py-16 bg-white/10 backdrop-blur-md border-y border-white/20 relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.5 }}
+          whileInView={{ opacity: 0.3 }}
           viewport={{ once: true }}
-          className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5"
+          className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10"
         />
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -187,10 +179,16 @@ export default function Home() {
                   whileInView={{ scale: 1 }}
                   transition={{ delay: index * 0.15 + 0.2, type: "spring", stiffness: 200 }}
                   viewport={{ once: true }}
+                  style={{ textShadow: "0 2px 10px rgba(255,255,255,0.3)" }}
                 >
                   {stat.value}
                 </motion.div>
-                <div className="text-muted-foreground">{stat.label}</div>
+                <div 
+                  className="text-slate-700 font-medium"
+                  style={{ textShadow: "0 1px 5px rgba(255,255,255,0.5)" }}
+                >
+                  {stat.label}
+                </div>
               </motion.div>
             ))}
           </div>
@@ -198,7 +196,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 bg-white/5 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -206,10 +204,22 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 
+              className="text-3xl md:text-4xl font-bold mb-4"
+              style={{ 
+                color: "hsl(220 20% 20%)",
+                textShadow: "0 2px 20px rgba(255,255,255,0.5)"
+              }}
+            >
               How It Works
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p 
+              className="text-lg max-w-2xl mx-auto"
+              style={{ 
+                color: "hsl(220 15% 30%)",
+                textShadow: "0 1px 10px rgba(255,255,255,0.8)"
+              }}
+            >
               Our simple 3-step process makes skin analysis accessible to everyone
             </p>
           </motion.div>
@@ -223,7 +233,7 @@ export default function Home() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-xl hover:border-primary/30 transition-all duration-300 cursor-default"
+                className="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-white/30 hover:shadow-xl hover:border-primary/30 hover:bg-white/30 transition-all duration-300 cursor-default"
               >
                 <motion.div 
                   className="w-14 h-14 rounded-xl gradient-hero flex items-center justify-center mb-6"
@@ -232,10 +242,23 @@ export default function Home() {
                 >
                   <feature.icon className="w-7 h-7 text-primary-foreground" />
                 </motion.div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
+                <h3 
+                  className="text-xl font-semibold mb-3"
+                  style={{ 
+                    color: "hsl(220 20% 20%)",
+                    textShadow: "0 1px 10px rgba(255,255,255,0.5)"
+                  }}
+                >
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <p 
+                  style={{ 
+                    color: "hsl(220 15% 35%)",
+                    textShadow: "0 1px 5px rgba(255,255,255,0.7)"
+                  }}
+                >
+                  {feature.description}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -243,7 +266,7 @@ export default function Home() {
       </section>
 
       {/* Warning Signs Section */}
-      <section className="py-20 bg-card border-y border-border">
+      <section className="py-20 bg-white/10 backdrop-blur-md border-y border-white/20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -256,10 +279,22 @@ export default function Home() {
                 <AlertTriangle className="w-4 h-4" />
                 Know the Signs
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              <h2 
+                className="text-3xl md:text-4xl font-bold mb-6"
+                style={{ 
+                  color: "hsl(220 20% 20%)",
+                  textShadow: "0 2px 20px rgba(255,255,255,0.5)"
+                }}
+              >
                 ABCDE Rule for Melanoma
               </h2>
-              <p className="text-muted-foreground mb-8">
+              <p 
+                className="mb-8"
+                style={{ 
+                  color: "hsl(220 15% 30%)",
+                  textShadow: "0 1px 10px rgba(255,255,255,0.8)"
+                }}
+              >
                 Use the ABCDE rule to identify potential warning signs. If you notice any of these, 
                 consult a dermatologist immediately.
               </p>
@@ -298,7 +333,7 @@ export default function Home() {
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   viewport={{ once: true }}
                   whileHover={{ x: 8, scale: 1.02, transition: { duration: 0.2 } }}
-                  className="flex items-start gap-4 bg-background rounded-xl p-4 border border-border hover:border-primary/30 hover:shadow-md transition-all cursor-default"
+                  className="flex items-start gap-4 bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30 hover:border-primary/30 hover:shadow-md hover:bg-white/30 transition-all cursor-default"
                 >
                   <motion.div 
                     className="w-10 h-10 rounded-lg gradient-hero flex items-center justify-center shrink-0"
@@ -307,8 +342,24 @@ export default function Home() {
                     <span className="font-bold text-primary-foreground">{item.letter}</span>
                   </motion.div>
                   <div>
-                    <h4 className="font-semibold text-foreground">{item.title}</h4>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    <h4 
+                      className="font-semibold"
+                      style={{ 
+                        color: "hsl(220 20% 20%)",
+                        textShadow: "0 1px 5px rgba(255,255,255,0.5)"
+                      }}
+                    >
+                      {item.title}
+                    </h4>
+                    <p 
+                      className="text-sm"
+                      style={{ 
+                        color: "hsl(220 15% 35%)",
+                        textShadow: "0 1px 3px rgba(255,255,255,0.7)"
+                      }}
+                    >
+                      {item.desc}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -318,7 +369,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 bg-white/5 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -326,7 +377,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
             whileHover={{ scale: 1.01 }}
-            className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary/10 via-secondary to-secondary rounded-3xl p-12 md:p-16 border border-border relative overflow-hidden"
+            className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary/20 via-white/20 to-primary/10 backdrop-blur-md rounded-3xl p-12 md:p-16 border border-white/30 relative overflow-hidden shadow-xl"
           >
             <motion.div
               className="absolute inset-0 opacity-30"
@@ -346,10 +397,22 @@ export default function Home() {
             >
               <Heart className="w-8 h-8 text-primary-foreground" />
             </motion.div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 relative">
+            <h2 
+              className="text-3xl md:text-4xl font-bold mb-4 relative"
+              style={{ 
+                color: "hsl(220 20% 20%)",
+                textShadow: "0 2px 20px rgba(255,255,255,0.5)"
+              }}
+            >
               Your Health Matters
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto relative">
+            <p 
+              className="text-lg mb-8 max-w-2xl mx-auto relative"
+              style={{ 
+                color: "hsl(220 15% 30%)",
+                textShadow: "0 1px 10px rgba(255,255,255,0.8)"
+              }}
+            >
               Don't wait for symptoms to worsen. Early detection can save lives. 
               Start your skin analysis today.
             </p>
@@ -368,6 +431,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-    </div>
+    </motion.div>
   );
 }

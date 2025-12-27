@@ -91,6 +91,14 @@ This project is built with:
 - Seamless integration with detection results
 - Professional medical facility suggestions
 
+### Interactive Map View
+- **Visual Location Display**: Interactive map showing doctors and hospitals
+- **Real-time Markers**: Color-coded markers for different facility types
+- **Click Interactions**: Click markers to see detailed information
+- **Zoom Controls**: Zoom in/out and fit all markers functionality
+- **Responsive Design**: Works on both desktop and mobile devices
+- **No API Keys Required**: Uses custom map visualization without external dependencies
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.

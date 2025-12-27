@@ -12,13 +12,15 @@ import {
   Loader2, 
   RefreshCw,
   Filter,
-  Info
+  Info,
+  Map
 } from 'lucide-react';
-import { Location, MedicalRecommendations as MedicalRecommendationsType, RiskLevel } from '@/types/medical';
+import { Location, MedicalRecommendations as MedicalRecommendationsType, RiskLevel, Doctor, Hospital } from '@/types/medical';
 import { MedicalDataService } from '@/utils/medicalDataService';
 import { LocationPermission } from './LocationPermission';
 import { DoctorCard } from './DoctorCard';
 import { HospitalCard } from './HospitalCard';
+import { MapView } from './MapView';
 
 interface MedicalRecommendationsProps {
   prediction: string;
@@ -30,6 +32,7 @@ export function MedicalRecommendations({ prediction, confidence }: MedicalRecomm
   const [recommendations, setRecommendations] = useState<MedicalRecommendationsType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchRadius, setSearchRadius] = useState(25);
+  const [selectedMapItem, setSelectedMapItem] = useState<Doctor | Hospital | null>(null);
   
   const riskLevel: RiskLevel = MedicalDataService.getRiskLevel(prediction, confidence);
 
@@ -72,9 +75,11 @@ export function MedicalRecommendations({ prediction, confidence }: MedicalRecomm
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-8"
+        className="mt-8 w-full flex justify-center"
       >
-        <LocationPermission onLocationSet={handleLocationSet} isLoading={isLoading} />
+        <div className="w-full max-w-6xl">
+          <LocationPermission onLocationSet={handleLocationSet} isLoading={isLoading} />
+        </div>
       </motion.div>
     );
   }
@@ -160,8 +165,12 @@ export function MedicalRecommendations({ prediction, confidence }: MedicalRecomm
 
       {/* Recommendations */}
       {recommendations && !isLoading && (
-        <Tabs defaultValue="doctors" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="map" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="map" className="flex items-center gap-2">
+              <Map className="w-4 h-4" />
+              Map View
+            </TabsTrigger>
             <TabsTrigger value="doctors" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Doctors ({recommendations.doctors.length})
@@ -172,11 +181,27 @@ export function MedicalRecommendations({ prediction, confidence }: MedicalRecomm
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="map" className="mt-6">
+            <MapView
+              userLocation={userLocation}
+              doctors={recommendations.doctors}
+              hospitals={recommendations.hospitals}
+              selectedItem={selectedMapItem}
+              onItemSelect={setSelectedMapItem}
+              isLoading={isLoading}
+            />
+          </TabsContent>
+
           <TabsContent value="doctors" className="mt-6">
             {recommendations.doctors.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {recommendations.doctors.map((doctor, index) => (
-                  <DoctorCard key={doctor.id} doctor={doctor} index={index} />
+                  <DoctorCard 
+                    key={doctor.id} 
+                    doctor={doctor} 
+                    index={index}
+                    userLocation={userLocation}
+                  />
                 ))}
               </div>
             ) : (
@@ -196,7 +221,12 @@ export function MedicalRecommendations({ prediction, confidence }: MedicalRecomm
             {recommendations.hospitals.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {recommendations.hospitals.map((hospital, index) => (
-                  <HospitalCard key={hospital.id} hospital={hospital} index={index} />
+                  <HospitalCard 
+                    key={hospital.id} 
+                    hospital={hospital} 
+                    index={index}
+                    userLocation={userLocation}
+                  />
                 ))}
               </div>
             ) : (

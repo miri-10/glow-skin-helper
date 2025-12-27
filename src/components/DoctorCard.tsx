@@ -8,9 +8,10 @@ import { Doctor } from '@/types/medical';
 interface DoctorCardProps {
   doctor: Doctor;
   index: number;
+  userLocation?: { latitude: number; longitude: number };
 }
 
-export function DoctorCard({ doctor, index }: DoctorCardProps) {
+export function DoctorCard({ doctor, index, userLocation }: DoctorCardProps) {
   const handleCall = () => {
     window.open(`tel:${doctor.contactNumber}`, '_self');
   };

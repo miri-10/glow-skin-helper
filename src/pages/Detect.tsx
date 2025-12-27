@@ -10,11 +10,14 @@ import {
   AlertTriangle,
   Image as ImageIcon,
   Info,
-  Sparkles
+  Sparkles,
+  Users,
+  Navigation
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { MedicalRecommendations } from "@/components/MedicalRecommendations";
+
 
 interface AnalysisResult {
   prediction: "benign" | "malignant" | "uncertain";
@@ -145,38 +148,62 @@ export default function Detect() {
   };
 
   return (
-    <div className="min-h-screen py-12 md:py-20">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.05 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      className="min-h-screen py-6 md:py-8 relative overflow-hidden"
+    >
+
+      
+      <div className="container mx-auto px-4 max-w-4xl relative z-10 pt-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full text-sm font-medium text-secondary-foreground mb-6"
+            className="inline-flex items-center gap-2 bg-card/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-foreground mb-6 border border-border shadow-lg"
           >
             <Sparkles className="w-4 h-4" />
             AI-Powered Analysis
           </motion.div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h1 
+            className="text-3xl md:text-4xl font-bold mb-4"
+            style={{ 
+              color: "hsl(220 20% 20%)",
+              textShadow: "0 2px 20px rgba(255,255,255,0.5)"
+            }}
+          >
             Skin Lesion Analysis
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p 
+            className="text-lg max-w-2xl mx-auto"
+            style={{ 
+              color: "hsl(220 15% 30%)",
+              textShadow: "0 1px 10px rgba(255,255,255,0.8)"
+            }}
+          >
             Upload a clear photo of your skin lesion for AI-powered analysis. 
             Ensure good lighting and focus for best results.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className={cn(
+          result ? "grid md:grid-cols-[1fr_0.8fr] gap-4 max-w-6xl mx-auto" : "max-w-lg mx-auto"
+        )}>
           {/* Upload Section */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
+            className="space-y-4 w-full"
           >
+            {/* Upload Box */}
             <motion.div
               whileHover={{ scale: previewUrl ? 1 : 1.02 }}
               onDragOver={(e) => {
@@ -186,12 +213,12 @@ export default function Detect() {
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               className={cn(
-                "relative border-2 border-dashed rounded-2xl p-8 transition-all duration-200 min-h-[320px] flex flex-col items-center justify-center",
+                "relative border-2 border-dashed rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center",
                 isDragging
-                  ? "border-primary bg-primary/5"
+                  ? "border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 shadow-lg"
                   : previewUrl
-                  ? "border-border bg-card"
-                  : "border-border hover:border-primary/50 bg-card hover:shadow-lg"
+                  ? "border-border bg-gradient-to-br from-card/90 via-primary/5 to-card/90 backdrop-blur-md min-h-[400px]"
+                  : "border-border hover:border-primary/50 bg-gradient-to-br from-card/90 via-primary/5 to-card/90 backdrop-blur-md hover:shadow-lg min-h-[400px]"
               )}
             >
               <AnimatePresence mode="wait">
@@ -206,15 +233,15 @@ export default function Detect() {
                     <img
                       src={previewUrl}
                       alt="Selected skin lesion"
-                      className="w-full h-64 object-cover rounded-xl"
+                      className="w-full h-80 object-cover rounded-xl"
                     />
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={clearImage}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-destructive/90 transition-colors"
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-destructive/90 transition-colors"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3 h-3" />
                     </motion.button>
                     {isAnalyzing && (
                       <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
@@ -227,8 +254,8 @@ export default function Detect() {
                           />
                         </div>
                         <div className="text-center">
-                          <Loader2 className="w-10 h-10 text-primary-foreground animate-spin mx-auto mb-2" />
-                          <p className="text-primary-foreground font-medium">Analyzing...</p>
+                          <Loader2 className="w-6 h-6 text-primary-foreground animate-spin mx-auto mb-1" />
+                          <p className="text-primary-foreground font-medium text-sm">Analyzing...</p>
                         </div>
                       </div>
                     )}
@@ -244,9 +271,9 @@ export default function Detect() {
                     <motion.div 
                       animate={{ y: [0, -5, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"
+                      className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-4 shadow-lg"
                     >
-                      <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                      <ImageIcon className="w-8 h-8 text-primary-foreground" />
                     </motion.div>
                     <p className="text-foreground font-medium mb-2">
                       Drop your image here
@@ -265,195 +292,204 @@ export default function Detect() {
               </AnimatePresence>
             </motion.div>
 
-            {selectedImage && !isAnalyzing && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4"
-              >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={handleAnalyze}
-                    variant="hero"
-                    size="lg"
-                    className="w-full"
-                    disabled={isAnalyzing}
-                  >
-                    <Upload className="w-5 h-5" />
-                    Analyze Image
-                  </Button>
-                </motion.div>
-              </motion.div>
-            )}
-
-            {/* Tips */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              whileHover={{ scale: 1.02 }}
-              className="mt-6 bg-secondary/50 rounded-xl p-4 border border-border hover:shadow-md transition-all"
-            >
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-foreground mb-1">Tips for best results</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Use natural lighting or bright indoor light</li>
-                    <li>• Keep the camera steady and focused</li>
-                    <li>• Capture the entire lesion with some surrounding skin</li>
-                    <li>• Avoid shadows on the lesion</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Results Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <AnimatePresence mode="wait">
-              {result ? (
+            {/* Analyze Button (appears below upload after image is uploaded) */}
+            <AnimatePresence>
+              {selectedImage && !result && (
                 <motion.div
-                  key="result"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-4"
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  {(() => {
-                    const styles = getResultStyles(result.prediction);
-                    const Icon = styles.icon;
-                    return (
-                      <>
-                        <motion.div 
-                          whileHover={{ scale: 1.02 }}
-                          className={cn(
-                            "rounded-2xl p-6 border transition-all",
-                            styles.bg,
-                            styles.border
-                          )}
-                        >
-                          <div className="flex items-center gap-3 mb-4">
-                            <motion.div
-                              animate={{ scale: [1, 1.1, 1] }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                            >
-                              <Icon className={cn("w-8 h-8", styles.iconColor)} />
-                            </motion.div>
-                            <div>
-                              <h3 className="text-xl font-semibold text-foreground">
-                                {styles.label}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                Confidence: {result.confidence}%
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Confidence Bar */}
-                          <div className="w-full h-2 bg-foreground/10 rounded-full overflow-hidden mb-4">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${result.confidence}%` }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className={cn("h-full rounded-full", 
-                                result.prediction === "benign" ? "bg-success" :
-                                result.prediction === "malignant" ? "bg-destructive" : "bg-warning"
-                              )}
-                            />
-                          </div>
-
-                          <p className="text-muted-foreground text-sm leading-relaxed">
-                            {result.explanation}
-                          </p>
-                        </motion.div>
-
-                        <motion.div 
-                          whileHover={{ scale: 1.02 }}
-                          className="bg-card rounded-2xl p-6 border border-border shadow-soft hover:shadow-lg transition-all"
-                        >
-                          <h4 className="font-semibold text-foreground mb-4">
-                            Recommendations
-                          </h4>
-                          <ul className="space-y-3">
-                            {result.recommendations.map((rec, index) => (
-                              <motion.li 
-                                key={index} 
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex items-start gap-3"
-                              >
-                                <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                <span className="text-sm text-muted-foreground">{rec}</span>
-                              </motion.li>
-                            ))}
-                          </ul>
-                        </motion.div>
-
-                        <div className="flex gap-2">
-                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
-                            <Button
-                              onClick={clearImage}
-                              variant="outline"
-                              className="w-full"
-                            >
-                              Analyze Another Image
-                            </Button>
-                          </motion.div>
-                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
-                            <Button
-                              asChild
-                              variant="secondary"
-                              className="w-full"
-                            >
-                              <a href="/medical-help">Find Medical Help</a>
-                            </Button>
-                          </motion.div>
-                        </div>
-
-                        {/* Medical Recommendations */}
-                        <MedicalRecommendations 
-                          prediction={result.prediction}
-                          confidence={result.confidence}
-                        />
-                      </>
-                    );
-                  })()}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="placeholder"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  whileHover={{ scale: 1.02 }}
-                  className="h-full min-h-[400px] flex items-center justify-center bg-card rounded-2xl border border-border hover:shadow-lg transition-all"
-                >
-                  <div className="text-center p-8">
-                    <motion.div 
-                      animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      onClick={handleAnalyze}
+                      variant="hero"
+                      size="lg"
+                      className="w-full"
+                      disabled={isAnalyzing}
                     >
-                      <AlertCircle className="w-8 h-8 text-muted-foreground" />
-                    </motion.div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      No Analysis Yet
-                    </h3>
-                    <p className="text-sm text-muted-foreground max-w-xs">
-                      Upload an image and click "Analyze Image" to receive AI-powered insights
-                    </p>
-                  </div>
+                      {isAnalyzing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Analyze Image
+                        </>
+                      )}
+                    </Button>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
+
+
           </motion.div>
+
+          {/* Right Side - Results or Placeholder */}
+          <AnimatePresence mode="wait">
+            {result ? (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                {(() => {
+                  const styles = getResultStyles(result.prediction);
+                  const Icon = styles.icon;
+                  return (
+                    <>
+                      {/* Analysis Result */}
+                      <motion.div 
+                        whileHover={{ scale: 1.02 }}
+                        className={cn(
+                          "rounded-2xl p-4 border transition-all bg-white shadow-lg",
+                          styles.border
+                        )}
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            <Icon className={cn("w-6 h-6", styles.iconColor)} />
+                          </motion.div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-foreground">
+                              {styles.label}
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
+                              Confidence: {result.confidence}%
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Confidence Bar */}
+                        <div className="w-full h-2 bg-foreground/10 rounded-full overflow-hidden mb-3">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${result.confidence}%` }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className={cn("h-full rounded-full", 
+                              result.prediction === "benign" ? "bg-success" :
+                              result.prediction === "malignant" ? "bg-destructive" : "bg-warning"
+                            )}
+                          />
+                        </div>
+
+                        <p className="text-muted-foreground text-xs leading-relaxed">
+                          {result.explanation}
+                        </p>
+                      </motion.div>
+
+                      {/* Recommendations */}
+                      <motion.div 
+                        whileHover={{ scale: 1.02 }}
+                        className="bg-white rounded-2xl p-4 border border-border shadow-lg hover:shadow-xl transition-all"
+                      >
+                        <h4 className="font-semibold text-foreground mb-3 text-sm">
+                          Recommendations
+                        </h4>
+                        <ul className="space-y-2">
+                          {result.recommendations.map((rec, index) => (
+                            <motion.li 
+                              key={index} 
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-start gap-2"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                              <span className="text-xs text-muted-foreground">{rec}</span>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      </motion.div>
+
+                      {/* Action Buttons */}
+                      <div className="flex justify-center">
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full max-w-xs">
+                          <Button
+                            onClick={clearImage}
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                          >
+                            Analyze Another
+                          </Button>
+                        </motion.div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="placeholder"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-2"
+              >
+                {/* Empty placeholder - content will appear after analysis */}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+
+        {/* Action Buttons Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-20"
+        >
+          <div className="max-w-md mx-auto">
+            {/* Find Medical Help Button */}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <div className="bg-white/20 backdrop-blur-md rounded-xl p-6 border border-white/30 hover:shadow-lg hover:bg-white/30 transition-all flex flex-col justify-center">
+                <div className="text-center">
+                  <AlertCircle className="w-8 h-8 text-primary mx-auto mb-3" />
+                  <h4 
+                    className="font-medium mb-2"
+                    style={{ 
+                      color: "hsl(220 20% 20%)",
+                      textShadow: "0 1px 10px rgba(255,255,255,0.5)"
+                    }}
+                  >
+                    Find Medical Help
+                  </h4>
+                  <p 
+                    className="text-sm mb-4"
+                    style={{ 
+                      color: "hsl(220 15% 30%)",
+                      textShadow: "0 1px 5px rgba(255,255,255,0.7)"
+                    }}
+                  >
+                    Locate nearby dermatologists and hospitals
+                  </p>
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="lg"
+                    className="w-full"
+                  >
+                    <a href="/medical-help">Find Medical Help</a>
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
+
 
         {/* Disclaimer */}
         <motion.div
@@ -461,15 +497,28 @@ export default function Detect() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           whileHover={{ scale: 1.01 }}
-          className="mt-12 bg-warning/5 border border-warning/20 rounded-xl p-4 text-center hover:shadow-md transition-all"
+          className="mt-12 bg-warning/10 backdrop-blur-md border border-warning/20 rounded-xl p-4 text-center hover:shadow-md transition-all"
         >
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Important:</strong> This tool is for educational purposes only 
+          <p 
+            className="text-sm"
+            style={{ 
+              color: "hsl(220 15% 30%)",
+              textShadow: "0 1px 5px rgba(255,255,255,0.8)"
+            }}
+          >
+            <strong 
+              style={{ 
+                color: "hsl(220 20% 20%)",
+                textShadow: "0 1px 5px rgba(255,255,255,0.5)"
+              }}
+            >
+              Important:
+            </strong> This tool is for educational purposes only 
             and does not provide medical diagnosis. Always consult a qualified healthcare professional for 
             medical advice and diagnosis.
           </p>
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
