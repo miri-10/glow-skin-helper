@@ -1,12 +1,21 @@
 # Skin Cancer Detection Backend API
 
-A secure FastAPI backend system for the Skin Cancer Detection Web App with user authentication and image storage.
+A secure FastAPI backend system for the Skin Cancer Detection Web App with **REAL AI integration** for melanoma classification.
+
+## 🧠 AI Features
+
+- **Real Deep Learning Model**: TensorFlow-based CNN for skin cancer detection
+- **Melanoma Classification**: Distinguishes between benign and malignant lesions
+- **Confidence Scoring**: Provides prediction confidence percentages
+- **Smart Recommendations**: AI-generated medical recommendations
+- **Image Preprocessing**: Automatic image optimization for analysis
 
 ## Features
 
+- **AI-Powered Analysis**: Real skin cancer detection using deep learning
 - **User Authentication**: Secure signup/login with JWT tokens
 - **Password Security**: Bcrypt hashing for password protection
-- **Image Upload**: Secure image upload with validation
+- **Image Upload**: Secure image upload with AI analysis
 - **File Storage**: Images stored on server with database references
 - **CORS Support**: Ready for frontend integration
 - **Input Validation**: Comprehensive error handling and validation
@@ -20,7 +29,21 @@ cd backend
 pip install -r requirements.txt
 ```
 
-### 2. Environment Configuration
+**Note**: TensorFlow installation may take several minutes.
+
+### 2. Setup AI Model
+
+```bash
+python setup_ai.py
+```
+
+This will:
+- Create the AI model directory
+- Download/create the skin cancer detection model
+- Test the model functionality
+- Verify everything is working
+
+### 3. Environment Configuration
 
 Update the `.env` file with your settings:
 
@@ -31,19 +54,43 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 DATABASE_URL=sqlite:///./skin_cancer_app.db
 ```
 
-### 3. Run the Server
+### 4. Run the Server
 
 ```bash
-python main.py
-```
-
-Or using uvicorn directly:
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python run.py
 ```
 
 The API will be available at: `http://localhost:8000`
+
+## 🤖 AI Endpoints
+
+### POST /analyze-image
+Analyze skin lesion image using AI model
+- **Headers**: `Authorization: Bearer <token>` (optional for demo)
+- **Body**: Form data with image file
+- **Returns**: AI analysis results with prediction, confidence, and recommendations
+
+```json
+{
+  "message": "Image analyzed successfully",
+  "image_id": 123,
+  "file_url": "http://localhost:8000/uploads/images/abc123.jpg",
+  "analysis": {
+    "prediction": "benign",
+    "confidence": 87.3,
+    "explanation": "The analyzed lesion shows characteristics commonly associated with benign skin conditions...",
+    "recommendations": [
+      "Continue regular self-examinations",
+      "Monitor for any changes in size, shape, or color",
+      "Schedule routine skin check with dermatologist"
+    ],
+    "raw_predictions": {
+      "benign": 0.873,
+      "malignant": 0.127
+    }
+  }
+}
+```
 
 ## API Endpoints
 

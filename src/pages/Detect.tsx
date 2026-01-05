@@ -12,11 +12,14 @@ import {
   Info,
   Sparkles,
   Users,
-  Navigation
+  Navigation,
+  Brain,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { MedicalRecommendations } from "@/components/MedicalRecommendations";
+import { aiService, type AnalysisResult } from "@/utils/aiService";
 
 
 interface AnalysisResult {
@@ -24,6 +27,10 @@ interface AnalysisResult {
   confidence: number;
   explanation: string;
   recommendations: string[];
+  raw_predictions?: {
+    benign: number;
+    malignant: number;
+  };
 }
 
 export default function Detect() {
@@ -66,50 +73,41 @@ export default function Detect() {
     setIsAnalyzing(true);
     setResult(null);
 
-    // Simulate AI analysis (in production, this would call the backend)
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    // Mock result for demonstration
-    const mockResults: AnalysisResult[] = [
-      {
-        prediction: "benign",
-        confidence: 87,
-        explanation: "The analyzed lesion shows characteristics commonly associated with benign skin conditions. The borders appear regular, color distribution is relatively uniform, and the overall pattern suggests a non-cancerous growth such as a common mole or seborrheic keratosis.",
-        recommendations: [
-          "Continue regular self-examinations",
-          "Monitor for any changes in size, shape, or color",
-          "Schedule routine skin check with dermatologist",
-          "Protect the area from excessive sun exposure"
-        ]
-      },
-      {
-        prediction: "malignant",
-        confidence: 72,
-        explanation: "The analyzed lesion displays some characteristics that warrant further medical evaluation. Features such as irregular borders, color variation, or asymmetry may indicate potential concerns that should be assessed by a healthcare professional.",
-        recommendations: [
-          "Schedule an appointment with a dermatologist immediately",
-          "Do not attempt to remove or treat the lesion yourself",
-          "Document any changes with photos",
-          "Prepare questions for your doctor visit"
-        ]
-      },
-      {
+    try {
+      // Use real AI service for analysis
+      const analysisResult = await aiService.analyzeImageDemo(selectedImage);
+      
+      setResult(analysisResult);
+      
+      toast({
+        title: "Analysis Complete",
+        description: `AI analysis completed with ${analysisResult.confidence}% confidence`,
+      });
+      
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      
+      toast({
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "Failed to analyze image. Please try again.",
+        variant: "destructive",
+      });
+      
+      // Set uncertain result on error
+      setResult({
         prediction: "uncertain",
-        confidence: 55,
-        explanation: "The image quality or lesion characteristics make it difficult to provide a confident assessment. This could be due to image clarity, lighting conditions, or the complexity of the lesion's features.",
+        confidence: 0,
+        explanation: "Analysis failed due to technical issues. Please try again with a clearer image or consult a healthcare professional.",
         recommendations: [
-          "Try uploading a clearer image with better lighting",
-          "Ensure the lesion is in focus and centered",
-          "Consider consulting a dermatologist for in-person evaluation",
-          "Don't rely solely on this tool for medical decisions"
+          "Try uploading the image again",
+          "Ensure good lighting and image quality",
+          "Consider consulting a dermatologist for professional evaluation",
+          "Don't rely solely on AI tools for medical decisions"
         ]
-      }
-    ];
-
-    // Randomly select a result for demonstration
-    const randomResult = mockResults[Math.floor(Math.random() * mockResults.length)];
-    setResult(randomResult);
-    setIsAnalyzing(false);
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const clearImage = () => {
@@ -169,8 +167,9 @@ export default function Detect() {
             transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
             className="inline-flex items-center gap-2 bg-card/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-foreground mb-6 border border-border shadow-lg"
           >
-            <Sparkles className="w-4 h-4" />
-            AI-Powered Analysis
+            <Brain className="w-4 h-4" />
+            <Zap className="w-3 h-3" />
+            Real AI-Powered Analysis
           </motion.div>
           <h1 
             className="text-3xl md:text-4xl font-bold mb-4"
@@ -188,8 +187,8 @@ export default function Detect() {
               textShadow: "0 1px 10px rgba(255,255,255,0.8)"
             }}
           >
-            Upload a clear photo of your skin lesion for AI-powered analysis. 
-            Ensure good lighting and focus for best results.
+            Upload a clear photo of your skin lesion for real AI-powered analysis using advanced deep learning models. 
+            Ensure good lighting and focus for accurate results.
           </p>
         </motion.div>
 

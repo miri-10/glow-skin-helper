@@ -18,6 +18,7 @@ from auth import (
     get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
 )
 from utils import validate_image_file, save_image, get_image_url
+from ai_service import detector
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -90,6 +91,57 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/analyze-image")
+async def analyze_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Analyze skin lesion image using AI model"""
+    
+    # Validate file
+    validate_image_file(file)
+    
+    try:
+        # Read image bytes
+        image_bytes = await file.read()
+        
+        # Run AI analysis
+        analysis_result = detector.predict(image_bytes)
+        
+        # Save image to disk
+        file.file.seek(0)  # Reset file pointer
+        file_path = save_image(file)
+        
+        # Save image record to database with AI results
+        db_image = Image(
+            user_id=current_user.id,
+            file_path=file_path,
+            original_filename=file.filename,
+            prediction_result=analysis_result.get("prediction", "uncertain"),
+            confidence_score=str(analysis_result.get("confidence", 0.0))
+        )
+        
+        db.add(db_image)
+        db.commit()
+        db.refresh(db_image)
+        
+        # Return analysis results with image info
+        file_url = get_image_url(file_path)
+        
+        return {
+            "message": "Image analyzed successfully",
+            "image_id": db_image.id,
+            "file_url": file_url,
+            "analysis": analysis_result
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Analysis failed: {str(e)}"
+        )
 
 @app.post("/upload-image", response_model=ImageUploadResponse)
 async def upload_image(
