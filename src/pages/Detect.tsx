@@ -27,18 +27,6 @@ import { screeningService } from "@/utils/screeningService";
 import { type ScanContext } from "@/utils/chatbotService";
 import { useScanContext } from "../App";
 
-
-interface AnalysisResult {
-  prediction: "benign" | "malignant" | "uncertain";
-  confidence: number;
-  explanation: string;
-  recommendations: string[];
-  raw_predictions?: {
-    benign: number;
-    malignant: number;
-  };
-}
-
 export default function Detect() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);

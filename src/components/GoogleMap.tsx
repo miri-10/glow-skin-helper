@@ -32,7 +32,7 @@ export function GoogleMap({
   onItemSelect,
   isLoading = false
 }: GoogleMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLIFrameElement>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
