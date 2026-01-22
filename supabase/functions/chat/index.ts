@@ -130,7 +130,7 @@ serve(async (req) => {
           { role: "user", content: userMessage },
         ],
         temperature: 0.7, // Balanced between creativity and consistency
-        max_tokens: 1000, // Reasonable response length
+        max_completion_tokens: 1000, // Reasonable response length
       }),
     });
 
