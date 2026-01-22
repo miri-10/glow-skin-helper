@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { ChatDrawer } from "@/components/ChatDrawer";
 import heroLandscape from "@/assets/hero-landscape.jpg";
 
 interface LayoutProps {
@@ -45,6 +46,9 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
       <Footer />
+      
+      {/* Floating AI Chat Assistant */}
+      <ChatDrawer />
     </div>
   );
 }
