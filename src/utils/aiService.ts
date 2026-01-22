@@ -68,7 +68,30 @@ class AIService {
    * Analyze image without authentication (demo mode)
    */
   async analyzeImageDemo(file: File): Promise<AnalysisResult> {
-    // Simulate API call for demo purposes
+    // First try the real API
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${this.baseUrl}/analyze-image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.analysis) {
+          console.log('✅ Real AI analysis successful:', data.analysis);
+          return data.analysis;
+        }
+      } else {
+        console.warn('⚠️ API call failed, falling back to mock data');
+      }
+    } catch (error) {
+      console.warn('⚠️ API connection failed, using mock data:', error);
+    }
+
+    // Fallback to mock data with realistic delay
     return new Promise((resolve, reject) => {
       // Validate file
       if (!file.type.startsWith('image/')) {
@@ -76,33 +99,14 @@ class AIService {
         return;
       }
 
+      console.log('🎭 Using mock AI analysis (backend not connected)');
+
       // Simulate processing time
       setTimeout(() => {
         try {
-          // Create FormData and attempt real API call
-          const formData = new FormData();
-          formData.append('file', file);
-
-          fetch(`${this.baseUrl}/analyze-image`, {
-            method: 'POST',
-            body: formData,
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.analysis) {
-              resolve(data.analysis);
-            } else {
-              // Fallback to mock data if API fails
-              resolve(this.getMockResult());
-            }
-          })
-          .catch(() => {
-            // Fallback to mock data if API fails
-            resolve(this.getMockResult());
-          });
-        } catch (error) {
-          // Fallback to mock data
           resolve(this.getMockResult());
+        } catch (error) {
+          reject(error);
         }
       }, 2000 + Math.random() * 2000); // 2-4 seconds
     });

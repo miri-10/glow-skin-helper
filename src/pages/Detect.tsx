@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { 
@@ -14,12 +14,18 @@ import {
   Users,
   Navigation,
   Brain,
-  Zap
+  Zap,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { MedicalRecommendations } from "@/components/MedicalRecommendations";
+import { ScreeningQuestionnaire, type QuestionnaireData } from "@/components/ScreeningQuestionnaire";
+import { ScreeningReport, type ScreeningReportData } from "@/components/ScreeningReport";
 import { aiService, type AnalysisResult } from "@/utils/aiService";
+import { screeningService } from "@/utils/screeningService";
+import { type ScanContext } from "@/utils/chatbotService";
+import { useScanContext } from "../App";
 
 
 interface AnalysisResult {
@@ -39,6 +45,22 @@ export default function Detect() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [screeningReport, setScreeningReport] = useState<ScreeningReportData | null>(null);
+  const { setScanContext } = useScanContext();
+
+  // Update scan context whenever scan data changes
+  useEffect(() => {
+    const scanContext: ScanContext = {
+      hasImage: !!selectedImage,
+      prediction: result?.prediction,
+      confidence: result?.confidence,
+      explanation: result?.explanation,
+      recommendations: result?.recommendations
+    };
+    setScanContext(scanContext);
+  }, [selectedImage, result, setScanContext]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -114,6 +136,62 @@ export default function Detect() {
     setSelectedImage(null);
     setPreviewUrl(null);
     setResult(null);
+    setShowQuestionnaire(false);
+    setScreeningReport(null);
+  };
+
+  const handleQuestionnaireSubmit = async (questionnaireData: QuestionnaireData) => {
+    if (!result) {
+      toast({
+        title: "Error",
+        description: "No image analysis result available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingReport(true);
+
+    try {
+      const screeningRequest = {
+        imageAnalysis: {
+          prediction: result.prediction,
+          confidence: result.confidence,
+          explanation: result.explanation,
+          recommendations: result.recommendations
+        },
+        questionnaire: questionnaireData
+      };
+
+      const report = await screeningService.generateScreeningReport(screeningRequest);
+      setScreeningReport(report);
+      setShowQuestionnaire(false);
+
+      toast({
+        title: "Screening Report Generated",
+        description: "Your comprehensive screening report is ready",
+      });
+
+    } catch (error) {
+      console.error('Report generation failed:', error);
+      
+      toast({
+        title: "Report Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate screening report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  const handleNewScreening = () => {
+    clearImage();
+  };
+
+  const handleFindMedicalHelp = () => {
+    // Navigate to medical help page
+    window.location.href = '/medical-help';
   };
 
   const getResultStyles = (prediction: string) => {
@@ -188,260 +266,302 @@ export default function Detect() {
             }}
           >
             Upload a clear photo of your skin lesion for real AI-powered analysis using advanced deep learning models. 
-            Ensure good lighting and focus for accurate results.
+            Complete the questionnaire for a comprehensive screening report.
           </p>
         </motion.div>
 
-        <div className={cn(
-          result ? "grid md:grid-cols-[1fr_0.8fr] gap-4 max-w-6xl mx-auto" : "max-w-lg mx-auto"
-        )}>
-          {/* Upload Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="space-y-4 w-full"
-          >
-            {/* Upload Box */}
-            <motion.div
-              whileHover={{ scale: previewUrl ? 1 : 1.02 }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              className={cn(
-                "relative border-2 border-dashed rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center",
-                isDragging
-                  ? "border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 shadow-lg"
-                  : previewUrl
-                  ? "border-border bg-gradient-to-br from-card/90 via-primary/5 to-card/90 backdrop-blur-md min-h-[400px]"
-                  : "border-border hover:border-primary/50 bg-gradient-to-br from-card/90 via-primary/5 to-card/90 backdrop-blur-md hover:shadow-lg min-h-[400px]"
-              )}
-            >
-              <AnimatePresence mode="wait">
-                {previewUrl ? (
-                  <motion.div
-                    key="preview"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="relative w-full"
-                  >
-                    <img
-                      src={previewUrl}
-                      alt="Selected skin lesion"
-                      className="w-full h-80 object-cover rounded-xl"
-                    />
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={clearImage}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-destructive/90 transition-colors"
-                    >
-                      <X className="w-3 h-3" />
-                    </motion.button>
-                    {isAnalyzing && (
-                      <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        <div className="w-full h-1 bg-primary/30 absolute top-0 rounded-t-xl overflow-hidden">
-                          <motion.div
-                            className="h-full bg-primary"
-                            animate={{ x: ["-100%", "100%"] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                            style={{ width: "50%" }}
-                          />
-                        </div>
-                        <div className="text-center">
-                          <Loader2 className="w-6 h-6 text-primary-foreground animate-spin mx-auto mb-1" />
-                          <p className="text-primary-foreground font-medium text-sm">Analyzing...</p>
-                        </div>
-                      </div>
+        {/* Main Content Area */}
+        <AnimatePresence mode="wait">
+          {screeningReport ? (
+            // Show Screening Report
+            <ScreeningReport
+              reportData={screeningReport}
+              onNewScreening={handleNewScreening}
+              onFindMedicalHelp={handleFindMedicalHelp}
+            />
+          ) : showQuestionnaire ? (
+            // Show Questionnaire
+            <ScreeningQuestionnaire
+              onSubmit={handleQuestionnaireSubmit}
+              onCancel={() => setShowQuestionnaire(false)}
+              isSubmitting={isGeneratingReport}
+            />
+          ) : (
+            // Show Image Upload and Analysis
+            <div className={cn(
+              result ? "grid md:grid-cols-[1fr_0.8fr] gap-4 max-w-6xl mx-auto" : "max-w-lg mx-auto"
+            )}>
+              {/* Upload Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="space-y-4 w-full"
+              >
+                {/* Upload Box */}
+                <motion.div
+                  whileHover={{ scale: previewUrl ? 1 : 1.02 }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  className={cn(
+                    "relative border-2 border-dashed rounded-2xl p-6 transition-all duration-200 flex flex-col items-center justify-center",
+                    isDragging
+                      ? "border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 shadow-lg"
+                      : previewUrl
+                      ? "border-border bg-gradient-to-br from-card/90 via-primary/5 to-card/90 backdrop-blur-md min-h-[400px]"
+                      : "border-border hover:border-primary/50 bg-gradient-to-br from-card/90 via-primary/5 to-card/90 backdrop-blur-md hover:shadow-lg min-h-[400px]"
+                  )}
+                >
+                  <AnimatePresence mode="wait">
+                    {previewUrl ? (
+                      <motion.div
+                        key="preview"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="relative w-full"
+                      >
+                        <img
+                          src={previewUrl}
+                          alt="Selected skin lesion"
+                          className="w-full h-80 object-cover rounded-xl"
+                        />
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={clearImage}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-destructive/90 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </motion.button>
+                        {isAnalyzing && (
+                          <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                            <div className="w-full h-1 bg-primary/30 absolute top-0 rounded-t-xl overflow-hidden">
+                              <motion.div
+                                className="h-full bg-primary"
+                                animate={{ x: ["-100%", "100%"] }}
+                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                style={{ width: "50%" }}
+                              />
+                            </div>
+                            <div className="text-center">
+                              <Loader2 className="w-6 h-6 text-primary-foreground animate-spin mx-auto mb-1" />
+                              <p className="text-primary-foreground font-medium text-sm">Analyzing...</p>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="upload"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-center"
+                      >
+                        <motion.div 
+                          animate={{ y: [0, -5, 0] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-4 shadow-lg"
+                        >
+                          <ImageIcon className="w-8 h-8 text-primary-foreground" />
+                        </motion.div>
+                        <p className="text-foreground font-medium mb-2">
+                          Drop your image here
+                        </p>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          or click to browse
+                        </p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </motion.div>
                     )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* Analyze Button */}
+                <AnimatePresence>
+                  {selectedImage && !result && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Button
+                          onClick={handleAnalyze}
+                          variant="hero"
+                          size="lg"
+                          className="w-full"
+                          disabled={isAnalyzing}
+                        >
+                          {isAnalyzing ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                              Analyzing...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              Analyze Image
+                            </>
+                          )}
+                        </Button>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Questionnaire Button */}
+                <AnimatePresence>
+                  {result && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                    >
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Button
+                          onClick={() => setShowQuestionnaire(true)}
+                          variant="outline"
+                          size="lg"
+                          className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          Complete Screening Questionnaire
+                        </Button>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Results Section */}
+              <AnimatePresence mode="wait">
+                {result ? (
+                  <motion.div
+                    key="results"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-4"
+                  >
+                    {(() => {
+                      const styles = getResultStyles(result.prediction);
+                      const Icon = styles.icon;
+                      return (
+                        <>
+                          {/* Analysis Result */}
+                          <motion.div 
+                            whileHover={{ scale: 1.02 }}
+                            className={cn(
+                              "rounded-2xl p-4 border transition-all bg-white shadow-lg",
+                              styles.border
+                            )}
+                          >
+                            <div className="flex items-center gap-3 mb-3">
+                              <motion.div
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                              >
+                                <Icon className={cn("w-6 h-6", styles.iconColor)} />
+                              </motion.div>
+                              <div>
+                                <h3 className="text-lg font-semibold text-foreground">
+                                  {styles.label}
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                  Confidence: {result.confidence}%
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {/* Confidence Bar */}
+                            <div className="w-full h-2 bg-foreground/10 rounded-full overflow-hidden mb-3">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${result.confidence}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className={cn("h-full rounded-full", 
+                                  result.prediction === "benign" ? "bg-success" :
+                                  result.prediction === "malignant" ? "bg-destructive" : "bg-warning"
+                                )}
+                              />
+                            </div>
+
+                            <p className="text-muted-foreground text-xs leading-relaxed">
+                              {result.explanation}
+                            </p>
+                          </motion.div>
+
+                          {/* Recommendations */}
+                          <motion.div 
+                            whileHover={{ scale: 1.02 }}
+                            className="bg-white rounded-2xl p-4 border border-border shadow-lg hover:shadow-xl transition-all"
+                          >
+                            <h4 className="font-semibold text-foreground mb-3 text-sm">
+                              Recommendations
+                            </h4>
+                            <ul className="space-y-2">
+                              {result.recommendations.map((rec, index) => (
+                                <motion.li 
+                                  key={index} 
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: index * 0.1 }}
+                                  className="flex items-start gap-2"
+                                >
+                                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                                  <span className="text-xs text-muted-foreground">{rec}</span>
+                                </motion.li>
+                              ))}
+                            </ul>
+                          </motion.div>
+
+                          {/* Action Buttons */}
+                          <div className="flex justify-center">
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full max-w-xs">
+                              <Button
+                                onClick={clearImage}
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                              >
+                                Analyze Another
+                              </Button>
+                            </motion.div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </motion.div>
                 ) : (
                   <motion.div
-                    key="upload"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-center"
+                    key="placeholder"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-2"
                   >
-                    <motion.div 
-                      animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="w-16 h-16 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-4 shadow-lg"
-                    >
-                      <ImageIcon className="w-8 h-8 text-primary-foreground" />
-                    </motion.div>
-                    <p className="text-foreground font-medium mb-2">
-                      Drop your image here
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      or click to browse
-                    </p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
+                    {/* Empty placeholder - content will appear after analysis */}
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
-
-            {/* Analyze Button (appears below upload after image is uploaded) */}
-            <AnimatePresence>
-              {selectedImage && !result && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      onClick={handleAnalyze}
-                      variant="hero"
-                      size="lg"
-                      className="w-full"
-                      disabled={isAnalyzing}
-                    >
-                      {isAnalyzing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Analyzing...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          Analyze Image
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-
-          </motion.div>
-
-          {/* Right Side - Results or Placeholder */}
-          <AnimatePresence mode="wait">
-            {result ? (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                {(() => {
-                  const styles = getResultStyles(result.prediction);
-                  const Icon = styles.icon;
-                  return (
-                    <>
-                      {/* Analysis Result */}
-                      <motion.div 
-                        whileHover={{ scale: 1.02 }}
-                        className={cn(
-                          "rounded-2xl p-4 border transition-all bg-white shadow-lg",
-                          styles.border
-                        )}
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <motion.div
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          >
-                            <Icon className={cn("w-6 h-6", styles.iconColor)} />
-                          </motion.div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-foreground">
-                              {styles.label}
-                            </h3>
-                            <p className="text-xs text-muted-foreground">
-                              Confidence: {result.confidence}%
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Confidence Bar */}
-                        <div className="w-full h-2 bg-foreground/10 rounded-full overflow-hidden mb-3">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${result.confidence}%` }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className={cn("h-full rounded-full", 
-                              result.prediction === "benign" ? "bg-success" :
-                              result.prediction === "malignant" ? "bg-destructive" : "bg-warning"
-                            )}
-                          />
-                        </div>
-
-                        <p className="text-muted-foreground text-xs leading-relaxed">
-                          {result.explanation}
-                        </p>
-                      </motion.div>
-
-                      {/* Recommendations */}
-                      <motion.div 
-                        whileHover={{ scale: 1.02 }}
-                        className="bg-white rounded-2xl p-4 border border-border shadow-lg hover:shadow-xl transition-all"
-                      >
-                        <h4 className="font-semibold text-foreground mb-3 text-sm">
-                          Recommendations
-                        </h4>
-                        <ul className="space-y-2">
-                          {result.recommendations.map((rec, index) => (
-                            <motion.li 
-                              key={index} 
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-start gap-2"
-                            >
-                              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                              <span className="text-xs text-muted-foreground">{rec}</span>
-                            </motion.li>
-                          ))}
-                        </ul>
-                      </motion.div>
-
-                      {/* Action Buttons */}
-                      <div className="flex justify-center">
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full max-w-xs">
-                          <Button
-                            onClick={clearImage}
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                          >
-                            Analyze Another
-                          </Button>
-                        </motion.div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="placeholder"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-2"
-              >
-                {/* Empty placeholder - content will appear after analysis */}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Action Buttons Section */}
         <motion.div
