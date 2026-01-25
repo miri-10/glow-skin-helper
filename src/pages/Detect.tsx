@@ -24,8 +24,6 @@ import { ScreeningQuestionnaire, type QuestionnaireData } from "@/components/Scr
 import { ScreeningReport, type ScreeningReportData } from "@/components/ScreeningReport";
 import { aiService, type AnalysisResult } from "@/utils/aiService";
 import { screeningService } from "@/utils/screeningService";
-import { type ScanContext } from "@/utils/chatbotService";
-import { useScanContext } from "../App";
 
 export default function Detect() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -36,19 +34,6 @@ export default function Detect() {
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [screeningReport, setScreeningReport] = useState<ScreeningReportData | null>(null);
-  const { setScanContext } = useScanContext();
-
-  // Update scan context whenever scan data changes
-  useEffect(() => {
-    const scanContext: ScanContext = {
-      hasImage: !!selectedImage,
-      prediction: result?.prediction,
-      confidence: result?.confidence,
-      explanation: result?.explanation,
-      recommendations: result?.recommendations
-    };
-    setScanContext(scanContext);
-  }, [selectedImage, result, setScanContext]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
